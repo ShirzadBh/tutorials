@@ -4,6 +4,7 @@ from pymxs import runtime as mxs
 
 # Execute
 def execute():
+    
     # Define the target object
     my_target = mxs.selection[0]
 
@@ -42,42 +43,53 @@ def execute():
     def setMode(name):
         name.curveType = 1
 
-    # Set iso view
-    mxs.execute("max vpt iso user")
+    try:
+        # Set iso view
+        mxs.execute("max vpt iso user")
 
-    # Define user draw curves
-    curves = mxs.startObjectCreation(mxs.FreehandSpline, returnNewNodes=True, newNodeCallback=setMode)
+        # Define user draw curves
+        curves = mxs.startObjectCreation(mxs.FreehandSpline, returnNewNodes=True, newNodeCallback=setMode)
 
-    # Define modifiers
-    noise_mod = mxs.Noisemodifier()
-    quad_mod = mxs.Quadify_Mesh()
-    extrude_mod = mxs.Extrude()
+        # Define modifiers
+        noise_mod = mxs.Noisemodifier()
+        quad_mod = mxs.Quadify_Mesh()
+        extrude_mod = mxs.Extrude()
 
-    # Change the parameters
-    extrude_mod.amount = distance * 2
-    quad_mod.quadsize = 2
-    noise_mod.scale = 10
-    noise_mod.fractal = True
-    noise_mod.strength = mxs.point3(5, 5, 5)
+        # Change the parameters
+        extrude_mod.amount = distance * 2
+        quad_mod.quadsize = 2
+        noise_mod.scale = 10
+        noise_mod.fractal = True
+        noise_mod.strength = mxs.point3(2, 10, 2)
 
-    # Add the modifiers
-    mxs.addmodifier(curves, extrude_mod)
-    mxs.addmodifier(curves, quad_mod)
-    mxs.addmodifier(curves, noise_mod)
+        # Add the modifiers
+        mxs.addmodifier(curves, extrude_mod)
+        mxs.addmodifier(curves, quad_mod)
+        mxs.addmodifier(curves, noise_mod)
 
-    # Define cutter splines
-    mxs.ProCutter.CreateCutter(curves, 1, True, True, False, True, True)
+        # Define cutter splines
+        mxs.ProCutter.CreateCutter(curves, 1, True, True, False, True, True)
 
-    # Define stock object
-    mxs.ProCutter.AddStocks(curves[0], my_target, 1, 1)
+        # Define stock object
+        mxs.ProCutter.AddStocks(curves[0], my_target, 1, 1)
 
-    # Set perspective view
-    mxs.execute("max vpt persp user")
+        # Set perspective view
+        mxs.execute("max vpt persp user")
 
-    # Deactivate and delete the grid
-    mxs.activegrid = None
-    mxs.delete(my_grid)
+        # Deactivate and delete the grid
+        mxs.activegrid = None
+        mxs.delete(my_grid)
+        
+    except:
+        
+        # Set perspective view
+        mxs.execute("max vpt persp user")
 
+        # Deactivate and delete the grid
+        mxs.activegrid = None
+        mxs.delete(my_grid)
+        
+        print("cancled")
 
 if (mxs.selection.count != 0):
 
