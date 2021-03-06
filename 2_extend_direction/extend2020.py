@@ -6,7 +6,6 @@ from PySide2.QtWidgets import QVBoxLayout, QPushButton, QDialog, QWidget
 from pymxs import runtime as mxs
 
 
-# Define Dialog Window
 class ExtendDirection(QDialog):
     def __init__(self, parent=MaxPlus.GetQMaxMainWindow()):
         super(ExtendDirection, self).__init__(parent)
