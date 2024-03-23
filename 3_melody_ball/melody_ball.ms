@@ -23,6 +23,15 @@ struct Ball
 		
 		-- apply the calculated pos using velocity to the pos of the ball
 		geo.pos += _dt * vel 
+	),
+	
+	-- add bounce point 
+	fn bounce _vec _bounciness:1 = 
+	(
+		_vec = normalize _vec
+		print vel
+		vel = (vel - 2 * (dot vel _vec) * _vec) * _bounciness
+		print vel
 	)
 )
 
@@ -40,5 +49,6 @@ _gravity = [0, 0, -10]
 for f = 0 to 500 do 
 (
 	ball.update_me _dt _gravity
+	if f == 250 then (ball.bounce [0, 0, 1] _bounciness:1)
 	redrawViews() 
 )
