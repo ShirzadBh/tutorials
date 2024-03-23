@@ -28,10 +28,11 @@ struct Ball
 	-- add bounce point 
 	fn bounce _vec _bounciness:1 = 
 	(
+		-- normalize the vector (we just want its directon)
 		_vec = normalize _vec
-		print vel
+		
+		-- calculate the reflection vector and apply it to the velocity
 		vel = (vel - 2 * (dot vel _vec) * _vec) * _bounciness
-		print vel
 	)
 )
 
