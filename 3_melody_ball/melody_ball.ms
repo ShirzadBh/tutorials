@@ -11,7 +11,7 @@ struct Ball
 	geo = Sphere(),
 	pPos = [0, 0, 0],
 	vel = [0, 0, 0],
-	
+		
 	-- update function for the ball at each frame
 	fn update_me _dt _gravity = 
 	(
@@ -36,11 +36,29 @@ struct Ball
 	)
 )
 
+-- define the custom attribute handeling keys 
+attrib = attributes "KeyAttribute"
+(
+parameters main rollout:params
+	(
+		param1 type:#boolean ui:keyParam default:10 animateable:True
+	)
+rollout params "Key Attribute"
+	(
+		checkbox keyParam "Key" type:#boolean
+	)
+)
+	
+
 -- clear the scene 
 clean_up() 
 
 -- create the ball 
 ball = Ball() 
+
+-- add the custom attribute to it 
+CustAttributes.add ball.geo attrib #Unique 
+
 
 -- define physical properties 
 _dt = 1.0 / frameRate
