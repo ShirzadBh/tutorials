@@ -1,11 +1,8 @@
--- clean up the scene 
-fn clean_up =  (
-	delete objects    -- remove all the objects 
-	gc()              -- free the grabage collector
-	clearListener()   -- clear up the listener
-)
+try(DestroyDialog melodyBall)catch()
 
 -- define the ball struct 
+global Ball
+
 struct Ball
 (
 	geo = Sphere(),
@@ -48,30 +45,24 @@ rollout params "Key Attribute"
 		checkbox keyParam "Key" type:#boolean
 	)
 )
-	
 
--- clear the scene 
-clean_up() 
-
--- create the ball 
-ball = Ball() 
-
--- add the custom attribute to it 
-CustAttributes.add ball.geo attrib #Unique 
-
-
--- define physical properties 
-_dt = 1.0 / frameRate
-_gravity = [0, 0, -10]
-
-
-_cone = cone rotation:(quat 0 -0.3 0 0.7)
-
--- a for loop to calculate the frames 
-for f = 0 to 500 do 
+rollout melodyBall "Scene Initiation" width:168 height:272
 (
-	ball.update_me _dt _gravity
-	-- if f == 250 then (ball.bounce [0, 0, 1] _bounciness:1)
-	if f == 250 then (ball.bounce _cone.dir _bounciness:1)
-	redrawViews() 
+	global ball
+	
+	button 'init_btn' "Initiate The Melody Ball" width:164 height:24 align:#center
+	
+	on init_btn pressed do 
+	(
+		-- create the ball 
+		ball = Ball()
+		
+		-- add the custom attribute to it 
+		CustAttributes.add ball.geo attrib #Unique 
+
+		-- disable the button
+		init_btn.enabled=false
+	)
 )
+
+createDialog melodyBall
