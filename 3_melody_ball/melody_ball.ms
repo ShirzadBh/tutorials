@@ -66,12 +66,13 @@ _gravity = [0, 0, -10]
 
 
 _cone = cone rotation:(quat 0 -0.3 0 0.7)
-
+trej = #()
 -- a for loop to calculate the frames 
-for f = 0 to 500 do 
+for f = 0 to 100 do 
 (
 	ball.update_me _dt _gravity
+	append trej ball.geo.pos 
 	-- if f == 250 then (ball.bounce [0, 0, 1] _bounciness:1)
-	if f == 250 then (ball.bounce _cone.dir _bounciness:1)
+	if f == 50 then (ball.bounce _cone.dir _bounciness:1)
 	redrawViews() 
 )
