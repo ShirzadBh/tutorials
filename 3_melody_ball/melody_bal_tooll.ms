@@ -11,16 +11,23 @@ fn debug_line =
 (
     gw.setTransform (matrix3 1)
     gw.Polyline #(_start, _end) false rgb:#(red, yellow) 
-    gw.enlargeUpdateRect #whole  
+	gw.hText  [mouse.pos.x,(gw.getWinSizeY() - mouse.pos.y) - 30, 0]  ("Simulate For: #[" + frames as string + "] Frames") color:green
+	gw.hText  [mouse.pos.x,(gw.getWinSizeY() - mouse.pos.y) - 46, 0]  ("Force: " + ((length (_start - _end)) as string)) color:green
+	_currentFrame = (sliderTime as integer / ticksPerFrame)
+	gw.hText  [mouse.pos.x,(gw.getWinSizeY() - mouse.pos.y) - 62, 0]  ("Range: #[" + (_currentFrame) as string + "] => #[" + (_currentFrame + frames) as string + "]") color:yellow
+    gw.enlargeUpdateRect #whole
 )
 
-
-
+30 - 46
+16 + 46
 -- create test object 
 _sphere = Sphere radius:10 wirecolor:gray 
 
 -- global debug variables 
-global _start, _end 
+global _start, _end, frames
+_start = [0, 0, 0]
+_end = [0, 0, 0]
+
 
 -- define the tool 
 tool shoot_me 
@@ -35,6 +42,7 @@ local _node, start_point, end_point
 
 on start do 
 (
+frames = 20
 if selection.count != 1 then #stop 
 )
 
@@ -49,11 +57,13 @@ on mousePoint clickno do
     (
 	if clickno == 1 then 
 	(	
+		_node = selection[1]
 		print clickno
 		print "Start to Pull"
 	
 		-- assign the start point position 
 		_start = worldPoint 
+		_start = _node.pos 
 	
 		registerRedrawViewsCallback debug_line
 	) 
