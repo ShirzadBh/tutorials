@@ -34,7 +34,7 @@ struct Ball
 		new_pos = pos 
 		
 		-- adjust the new vel 
-		new_vel = (new_vel - 2 * (dot new_vel _vec) * _vec) 
+		new_vel = -(new_vel - 2 * (dot new_vel _vec) * _vec) 
 
 		for f = 0 to f_num do 
 		(
