@@ -30,13 +30,20 @@ local _node, start_point, end_point
  
 -- methods 
 
+
 -- handlers 
 
 on start do 
 (
 if selection.count != 1 then #stop 
-
 )
+
+on stop do 
+(
+unregisterRedrawViewsCallback debug_line
+)
+
+
 
 on mousePoint clickno do
     (
