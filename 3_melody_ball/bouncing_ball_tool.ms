@@ -1,12 +1,8 @@
-
--- clean up the scene 
-unregisterRedrawViewsCallback debug 
-
 -- global parameters and variables 
 global grab_point, release_point, frames, trajectory, _deltaTime, _gravity 
 
 grab_point = [0, 0, 0]       -- position where we start grabbing (for simplicity, I'll assign it to the node position)
-release_point = [0, 0, 10]    -- position where we release the mouse to shoot the node 
+release_point = [0, 0, 0]    -- position where we release the mouse to shoot the node 
 frames = 40                -- number of frames we want to simulate
 trajectory = #()             -- an array of positions to debug the trajectory of the node 
 
@@ -88,9 +84,6 @@ fn simulate _node:undefined _force:[0, 0, 0] anim:false f_num:0 =
 	)
 )
 
--- trajectory = simulate _node:selection[1] _force:[-20, 8, 20] anim:true f_num:40
-
-
 
 -- define the tool 
 tool Shooter 
@@ -131,11 +124,11 @@ tool Shooter
 	
 	on mouseMove clickno do 
 	(
-		-- calculate the force 
-		_force = grab_point - release_point 
-		
 		-- assign the release point 
 		release_point = worldPoint 
+		
+		-- calculate the force 
+		_force = grab_point - release_point 
 		
 		-- visualize the trajectory 
 		trajectory = simulate _node:_node _force:_force anim:false f_num:frames
@@ -144,7 +137,6 @@ tool Shooter
 		redrawViews()
 	)
 )
-
 
 -- run the tool 
 startTool Shooter 
