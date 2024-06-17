@@ -7,45 +7,61 @@ gc()
 catch()
 
 -- global debug variables 
-global _start, _end, frames, _trej
-_start = [0, 0, 0]
-_end = [0, 0, 0]
+global grab_point, release_point, frames, trajectory
+grab_point = [0, 0, 0]
+release_point = [0, 0, 0]
 frames = 40
-_trej = #()
+trajectory = #()
 
 -- define physical properties 
-_dt = 1.0 / frameRate
-_gravity = [0, 0, -100]
+_deltaTime = (1.0 / frameRate) * 8
+_gravity = [0, 0, -10]
 
 
 fn simulate _node:undefined _force:[0, 0, 0] anim:false f_num:0 =
 (
 	
 	-- temp array to keep the trajectory in 
-	_trej = #() 
+	trajectory = #() 
 	
 	-- initiate physical properties 
-	new_vel = _force
-	new_pPos = _node.pos  
-	new_pos = _node.pos 
+	_vel = _force
+	_pPos = _node.pos  
+	_pos = _node.pos 
 
 
 	for f = 0 to f_num do 
 	(
-		new_vel += _gravity * _dt 
-		new_pPos = new_pos 
-		new_pos += _dt * new_vel 
-		append _trej new_pos 
+		_vel += _gravity * _deltaTime 
+		_pPos = _pos 
+		_pos += _deltaTime * _vel 
+		append trajectory _pos 
 	)
 	
 	if not anim then 
 	(
-		_trej
+		trajectory
 	)
 	else 
 	(
 		-- animate the object 
-		_trej
+		undo on 
+		(
+			animate on 
+			(
+				_currentFrame = (sliderTime as integer / ticksPerFrame)
+				ind = 1
+				for f = _currentFrame to (_currentFrame + f_num) do 
+				(
+					at time (f+1)
+					(
+						_node.pos = trajectory[ind]
+					)
+					ind += 1
+				)
+			)
+		)
+		trajectory
 	)
 )
 
@@ -53,13 +69,13 @@ fn simulate _node:undefined _force:[0, 0, 0] anim:false f_num:0 =
 fn debug_line = 
 (
     gw.setTransform (matrix3 1)
-    gw.Polyline #(_start, _end) false rgb:#(yellow, green) 
+    gw.Polyline #(grab_point, release_point) false rgb:#(yellow, green) 
 	gw.hText  [mouse.pos.x,(gw.getWinSizeY() - mouse.pos.y) - 30, 0]  ("Simulate For: #[" + frames as string + "] Frames") color:green
-	gw.hText  [mouse.pos.x,(gw.getWinSizeY() - mouse.pos.y) - 46, 0]  ("Force: " + ((length (_start - _end)) as string)) color:green
+	gw.hText  [mouse.pos.x,(gw.getWinSizeY() - mouse.pos.y) - 46, 0]  ("Force: " + ((length (grab_point - release_point)) as string)) color:green
 	_currentFrame = (sliderTime as integer / ticksPerFrame)
 	gw.hText  [mouse.pos.x,(gw.getWinSizeY() - mouse.pos.y) - 62, 0]  ("Range: #[" + (_currentFrame) as string + "] => #[" + (_currentFrame + frames) as string + "]") color:yellow
 	gw.setColor #line yellow 
-	gw.Polyline _trej false 
+	gw.Polyline trajectory false 
 	gw.enlargeUpdateRect #whole
 )
 
@@ -71,16 +87,13 @@ _sphere = Sphere radius:10 wirecolor:gray
 tool shoot_me 
 (
 -- local variables 
-local _node, start_point, end_point 
+local _node, _force
  
--- methods 
-
-
 -- handlers 
 
 on start do 
 (
-if selection.count != 1 then #stop 
+	if selection.count != 1 then #stop else _node = selection[1]
 )
 
 on stop do 
@@ -92,45 +105,35 @@ unregisterRedrawViewsCallback debug_line
 
 on mousePoint clickno do
     (
-	if clickno == 1 then 
-	(	
-		_node = selection[1]
-		print clickno
-		print "Start to Pull"
-	
-		-- assign the start point position 
-		_start = worldPoint 
-		_start = _node.pos 
-	
-		registerRedrawViewsCallback debug_line
-	) 
-	else if clickno > 1 then 
-	(
-	-- do the shooting here ...
-	print ("Start Pos: " + _start as string)
-	print ("End Pos: " + _end as string)
+		if clickno == 1 then 
+		(	
+			-- assign the start point position 
+			grab_point = _node.pos 
 		
+			registerRedrawViewsCallback debug_line
+		) 
+		else if clickno == 2 then 
+		(
+			-- do the shooting here ...
+			simulate _node:_node _force:_force anim:true f_num:frames
 
-	
-	-- and end the tool
-	unregisterRedrawViewsCallback debug_line
-	#stop
-	)
+			#stop
+		)
     )
     
 on mouseMove clickno do
     (
-    	print "Pulling"
 		-- calculate the force 
-		_vel = _start - _end 
-    	simulate _node:_node _force:_vel f_num:frames
+		_force = grab_point - release_point 
 
-	-- assign the end point 
-	_end = worldPoint 
-    
+		-- assign the end point 
+		release_point = worldPoint 
 		
-	-- redraw 
-	redrawViews()
+		-- visualize the trajectory
+		simulate _node:_node _force:_force f_num:frames
+			
+		-- redraw 
+		redrawViews()
     )
 )
 
